@@ -10,109 +10,151 @@
 status Timer_Init(uint8 Timer)
 {
 	uint8 Status=0;
-	switch(Timer)
+	if(Timer < NUM_OF_TIMERS)
 	{
-	case TIMER_0 :
-		if(Timer_arr[0].Mode == NORMAL)
+		switch(Timer)
 		{
-			if(Timer_arr[0].Prescaler >  CLK_FALING )
+		case TIMER_0 :
+			if(Timer_arr[TIMER_0].Mode == NORMAL)
 			{
-				Status=NOK;
+				TCCR0 &= ~(1<<WGM00);
+				TCCR0 &= ~(1<<WGM01);
+				Status = OK;
 			}else
 			{
-				TCCR0 |= Timer_arr[0].Prescaler ;
+				Status = NOK;
 			}
-			if(Timer_arr[0].ISR == ISR_EN)
+
+			break;
+
+		case TIMER_1 :
+			if(Timer_arr[TIMER_1].Mode == NORMAL)
 			{
-				TIMSK |= 1<<TOIE0; // Interrupt when overflow
+				TCCR1A &= ~(1<<WGM10);
+				TCCR1A &= ~(1<<WGM11);
+				TCCR1B &= ~(1<<WGM12);
+				TCCR1B &= ~(1<<WGM13);
+				Status = OK;
+
 			}else
 			{
-				TIMSK &= ~(1<<TOIE0);
+				Status = NOK;
 			}
+			break;
+		case TIMER_2 :
+			if(Timer_arr[TIMER_2].Mode == NORMAL)
+			{
+				TCCR2 &= ~(1<<WGM20);
+				TCCR2 &= ~(1<<WGM21);
+				Status = OK;
+
+			}else
+			{
+				Status = NOK;
+			}
+			break;
 		}
-		break;
 
-	case TIMER_1 :
-		if(Timer_arr[1].Mode == NORMAL)
-		{
-			if(Timer_arr[1].Prescaler >  CLK_FALING )
-			{
-				Status =NOK;
-			}else
-			{
 
-				TCCR1B |= Timer_arr[1].Prescaler ;
-			}
-
-			TCNT1 = Timer_arr[1].CounterLoad;
-			if(Timer_arr[1].ISR == ISR_EN)
-			{
-				TIMSK |= 1<<TOIE1; // Interrupt when overflow
-			}else
-			{
-				TIMSK &= ~(1<<TOIE1);
-			}
-		}
-		break;
-	case TIMER_2 :
-		if(Timer_arr[2].Mode == NORMAL)
-		{
-			if(Timer_arr[2].Prescaler < CLK_FALING )
-			{
-				TCCR2 |= Timer_arr[2].Prescaler ;
-			}else
-			{
-				Status =NOK;
-			}
-
-			TCNT2 = Timer_arr[2].CounterLoad;
-			if(Timer_arr[2].ISR == ISR_EN)
-			{
-				TIMSK |= 1<<TOIE2; // Interrupt when overflow
-			}else
-			{
-				TIMSK &= ~(1<<TOIE2);
-			}
-		}
-		break;
+	}else{
+		Status= NOK;
 	}
 	return Status;
 }
 
-void Timer_Start(uint8 Timer)
-{
+status Timer_SetPrescaler(uint8 Timer)
+{ uint8 Status=0;
 	switch(Timer)
 	{
 	case TIMER_0 :
-		TCCR0 |= Timer_arr[0].Prescaler ;
+		TCCR0 |= Timer_arr[TIMER_0].Prescaler ;
+		Status =OK;
 		break;
 	case TIMER_1 :
-		TCCR1B |= Timer_arr[1].Prescaler ;
+		TCCR1B |= Timer_arr[TIMER_1].Prescaler ;
+		Status =OK;
 		break;
 	case TIMER_2 :
-		TCCR2 |= Timer_arr[2].Prescaler ;
+		TCCR2 |= Timer_arr[TIMER_2].Prescaler ;
+		Status =OK;
 		break;
 	}
+	return Status;
 }
 void Timer_Stop(uint8 Timer)
 {
 	switch(Timer)
 	{
 	case TIMER_0 :
-	TCCR0 &= ~(1<< CS00);
-	TCCR0 &= ~(1<< CS01);
-	TCCR0 &= ~(1<< CS02);
-		break;
-	case TIMER_1 :
-		TCCR1B &= ~(1<< CS10);
-		TCCR1B &= ~(1<< CS11);
-		TCCR1B &= ~(1<< CS12);
+		if(Timer_arr[TIMER_0].ISR == ISR_DS)
+		{
+			TIMSK &= ~(1<<TOIE0);
+		}
+		else
+		{
+
+		}
 
 		break;
+	case TIMER_1 :
+		if(Timer_arr[TIMER_1].ISR == ISR_EN)
+		{
+			TIMSK &= ~(1<<TOIE1);
+		}
+		else
+		{
+
+		}
+		break;
 	case TIMER_2 :
-		TCCR2 &= ~(1<< CS20);
-		TCCR2 &= ~(1<< CS21);
-		TCCR2 &= ~(1<< CS22);
+		if(Timer_arr[TIMER_2].ISR == ISR_EN)
+		{
+			TIMSK &= ~(1<<TOIE2);
+		}
+		else
+		{
+
+		}
 		break;
 	}
+
+}
+void Timer_Start(uint8 Timer)
+{
+	switch(Timer)
+	{
+	case TIMER_0 :
+		if(Timer_arr[TIMER_0].ISR == ISR_EN)
+		{
+			TIMSK |=1<<TOIE0;
+			TCNT0=0;
+		}
+		else
+		{
+
+		}
+
+		break;
+	case TIMER_1 :
+		if(Timer_arr[TIMER_1].ISR == ISR_EN)
+		{
+			TIMSK |=1<<TOIE1;
+		}
+		else
+		{
+
+		}
+		break;
+	case TIMER_2 :
+		if(Timer_arr[TIMER_2].ISR == ISR_EN)
+		{
+			TIMSK |=1<<TOIE2;
+		}
+		else
+		{
+
+		}
+		break;
+	}
+
 }

@@ -3,42 +3,45 @@
 
 #include "timer.h"
 #include "dio.h"
+#include "Reg.h"
 #include "TMU.h"
-#include <avr/interrupt.h>
 
-uint8_t flag =0;
-uint8_t counter=0;
+
 void System_Init();
 void Led1_Toggle();
 void Led2_Toggle();
 int main(void){
 
-System_Init();
+	System_Init();
 
-sei();
-while(1)
-{
-TMU_Dispatcher();
 
-}
+	while(1)
+	{
+	TMU_Dispatcher();
+
+
+	}
 	return 0;
 }
 
 
 void System_Init()
-		{
+{
 
-		TMU_Init(&TMU_Cfg,1);
+	Dio_init();
+	TMU_Init(&TMU_Config);
+	TMU_Start(500,Led2_Toggle,1,&TMU_Config);
+	TMU_Start(250,Led1_Toggle,1,&TMU_Config);
+	TMU_Stop(Led2_Toggle);
 
-		TMU_Start_Time(5,Led1_Toggle, PERIODIC,&TMU_Cfg);
-		TMU_Start_Time(10,Led2_Toggle, PERIODIC,&TMU_Cfg);
-		Dio_init();
-		}
+}
 void Led1_Toggle()
 {
-	PORTA ^=1<<PIN0;
+	PORTA_REG ^=1<<PIN0;
 }
 void Led2_Toggle()
 {
-	PORTA ^=1<<PIN1;
+	PORTA_REG ^=1<<PIN1;
 }
+
+

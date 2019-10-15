@@ -13,8 +13,7 @@
 typedef	enum{timer0,NUM_OF_TIMERS}timers;
 
 #define INITI 1
-#define ISR_EN 1
-#define ISR_DS 0
+
 
 #define TIMER_0		0
 #define TIMER_1		1
@@ -55,14 +54,12 @@ typedef	enum{timer0,NUM_OF_TIMERS}timers;
 
 typedef	enum{NORMAL,CTC}Mode;
 typedef	enum{NO_CLK,CLK_DIV_1,CLK_DIV_8,CLK_DIV_64,CLK_DIV_256,CLK_DIV_1024,CLK_RISING,CLK_FALING}Prescaler;
+typedef	enum{ISR_EN,ISR_DS}ISR;
 typedef	struct{
 	uint8 Timer;
 	uint8 Mode;
 	uint8 Prescaler;
 	uint8 ISR;
-	uint8 CounterLoad;
-	uint8 Init;
-
 }Timer_Config;
 
 Timer_Config Timer_arr[NUM_OF_TIMERS];

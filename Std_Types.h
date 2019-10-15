@@ -7,6 +7,8 @@
 
 #ifndef STD_TYPES_H_
 #define STD_TYPES_H_
+
+#define NULL ((void *)0)
 typedef enum{NOK,OK}status;
 
 typedef unsigned char         boolean;

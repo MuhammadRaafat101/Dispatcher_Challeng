@@ -17,6 +17,7 @@
 
 status Timer_Init(uint8 Timer);
 void Timer_Start(uint8 Timer);
+status Timer_SetPrescaler(uint8 Timer);
 void Timer_Stop(uint8 Timer);
 //void delay(uint32 delay,uint8 Timer,void (*ptr)(void));
 

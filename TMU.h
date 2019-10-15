@@ -1,35 +1,56 @@
 /*
  * TMU.h
  *
- *  Created on: Oct 12, 2019
- *      Author: Mina
+ *  Created on: Oct 15, 2019
+ *      Author: Rafaat
  */
 
 #ifndef TMU_H_
 #define TMU_H_
 
-#include "PostBuilding_Cfg.h"
 
-#define ISR_FREQ 4
+#include "TMU_PBcfg.h"
+#include "TMU_PREcfg.h"
+#include "TIMER.h"
+#include <avr/interrupt.h>
 
-typedef struct Func_pointer
+
+typedef void(*ptrTmuFunctionCallBk_t)(void);
+
+typedef enum {ACTIVE,NOTACTIVE}Activity;
+typedef enum {INVALID_ARGUMENT=-500,BUFFER_IS_FULL=-400,NOERROR=1}errorType;
+
+
+typedef struct{
+	uint8 Timer;
+	uint8 Reselution;
+}TMU_Config_t;
+
+extern TMU_Config_t TMU_Config;
+
+
+/*
+ * Buffer for some information about the counsumers
+ * Delay : the time that this consumer called after
+ * Periodicity : this consumer will be periodic or oneshot
+ * ptrTmuFunctionCallBk_t :Function name of consumer
+ */
+typedef struct
 {
-	void (*func_ptr)(void);
-	uint8 Func_time;
-	TMU_Func_t func_type;
-	Func_Status_t func_status;
-	uint8 start_time;
-}Func_Ptr;
+	volatile uint32 delay;
+	volatile uint8 Periodicity;
+	ptrTmuFunctionCallBk_t FuncName;
 
-Func_Ptr Buffer[MAX_FUNC_NUMBER];
+}TMU_Buffer;
 
+extern TMU_Buffer TMU_Buffer_arr[NumOfTasks];
 
+errorType TMU_Init(TMU_Config_t *Config);
 
-EnmTMUError_t TMU_Init (TMU_ConfigType *ConfigPtr, uint8 resolution);
-void TMU_Dispatcher(void);
-void TMU_Start_Time (uint8 Time, void (*func_ptr)(void), TMU_Func_t func_type,TMU_ConfigType *ConfigPtr);
-void TMU_StopTimer (void (*func_ptr)(void));
+errorType TMU_Start(uint32 delay, ptrTmuFunctionCallBk_t FuncName, uint8 priodicity,TMU_Config_t *Config);
 
+void TMU_Stop(ptrTmuFunctionCallBk_t FuncName);
 
+void TMU_Dispatcher();
 
 #endif /* TMU_H_ */
